@@ -9,4 +9,7 @@
 
     <string name="up">Up</string>
 
+    <string name="transition_photo">thumbtobanner</string>
+    <string name="transition_heading">detailtobar</string>
+
 </resources>

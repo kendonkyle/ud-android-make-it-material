@@ -1,23 +1,27 @@
 package com.example.xyzreader.ui;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
-import com.android.volley.toolbox.NetworkImageView;
+/**
+ * Created by Kendon Kyle on 2017/11/17 for the AppBarImageBackground.
+ * The one extended from NetworkImage doesn't seem to work in the same way as normal imageview
+ */
 
-public class DynamicHeightNetworkImageView extends NetworkImageView {
-    private float mAspectRatio = 1.5f;
+public class AdjustableAspectImageView extends AppCompatImageView {
+    private float mAspectRatio = 2.5f;
 
-    public DynamicHeightNetworkImageView(Context context) {
-        super(context);
+    public AdjustableAspectImageView(Context c) {
+        super(c); //:)
     }
 
-    public DynamicHeightNetworkImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public AdjustableAspectImageView(Context c, AttributeSet attr) {
+        super(c, attr);
     }
 
-    public DynamicHeightNetworkImageView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+    public AdjustableAspectImageView(Context c, AttributeSet attr, int defStyle) {
+        super(c, attr, defStyle);
     }
 
     public void setAspectRatio(float aspectRatio) {
