@@ -47,6 +47,7 @@ public class ArticleDetailActivity extends AppCompatActivity
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                             View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            postponeEnterTransition(); //trying this to get transitions to work, turns out fragments and shared elements do not work this way
         }
         setContentView(R.layout.activity_article_detail);
 
@@ -83,7 +84,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = new Slide(Gravity.RIGHT);
             slide.addTarget(R.id.pager);
-            slide.setDuration(1000);
+            slide.setDuration(400);
             getWindow().setEnterTransition(slide);
         }
     }

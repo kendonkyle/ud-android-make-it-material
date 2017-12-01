@@ -92,7 +92,7 @@ public class ArticleListActivity extends AppCompatActivity implements
             Slide slideTransition = new Slide();
             slideTransition.setSlideEdge(Gravity.LEFT);
 //            slideTransition.setDuration(getResources().getInteger(R.integer.anim_duration));
-            slideTransition.setDuration(500);
+            slideTransition.setDuration(300);
             getWindow().setReenterTransition(slideTransition);
             getWindow().setExitTransition(slideTransition);
         }
