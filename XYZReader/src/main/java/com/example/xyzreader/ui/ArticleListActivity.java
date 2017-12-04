@@ -91,7 +91,6 @@ public class ArticleListActivity extends AppCompatActivity implements
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slideTransition = new Slide();
             slideTransition.setSlideEdge(Gravity.LEFT);
-//            slideTransition.setDuration(getResources().getInteger(R.integer.anim_duration));
             slideTransition.setDuration(300);
             getWindow().setReenterTransition(slideTransition);
             getWindow().setExitTransition(slideTransition);
@@ -179,17 +178,7 @@ public class ArticleListActivity extends AppCompatActivity implements
                 public void onClick(View view) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Bundle bundle = ActivityOptions
-                                .makeSceneTransitionAnimation(
-                                        ArticleListActivity.this
-                                        ,vh.thumbnailView
-                                        ,getString(R.string.transition_photo)
-                                ).toBundle();
-                        startActivity(intent, bundle);
-                    } else {
-                        startActivity(intent);
-                    }
+                    startActivity(intent);
                 }
             });
             return vh;

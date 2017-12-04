@@ -19,9 +19,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class UpdaterService extends IntentService {
     private static final String TAG = "UpdaterService";
+    private static final int CACHE_TIME = 120000;
 
     public static final String BROADCAST_ACTION_STATE_CHANGE
             = "com.example.xyzreader.intent.action.STATE_CHANGE";
@@ -32,55 +34,63 @@ public class UpdaterService extends IntentService {
         super(TAG);
     }
 
+    private static Date mLastRun;
+
     @Override
     protected void onHandleIntent(Intent intent) {
-        Time time = new Time();
+        Date time = new Date();
+        if(mLastRun == null) {
+            mLastRun = time;
+        }
+        else if ((time.getTime() - mLastRun.getTime()) < CACHE_TIME) {
+            Log.w(TAG, "Cache timeout not reached, not refreshing.");
+            return;
+        }
 
-//        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-//        NetworkInfo ni = cm.getActiveNetworkInfo();
-//        if (ni == null || !ni.isConnected()) {
-//            Log.w(TAG, "Not online, not refreshing.");
-//            return;
-//        }
-//
-//        sendStickyBroadcast(
-//                new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, true));
-//
-//        // Don't even inspect the intent, we only do one thing, and that's fetch content.
-//        ArrayList<ContentProviderOperation> cpo = new ArrayList<ContentProviderOperation>();
-//
-//        Uri dirUri = ItemsContract.Items.buildDirUri();
-//
-//        // Delete all items
-//        cpo.add(ContentProviderOperation.newDelete(dirUri).build());
-//
-//        try {
-//            JSONArray array = RemoteEndpointUtil.fetchJsonArray();
-//            if (array == null) {
-//                throw new JSONException("Invalid parsed item array" );
-//            }
-//
-//            for (int i = 0; i < array.length(); i++) {
-//                ContentValues values = new ContentValues();
-//                JSONObject object = array.getJSONObject(i);
-//                values.put(ItemsContract.Items.SERVER_ID, object.getString("id" ));
-//                values.put(ItemsContract.Items.AUTHOR, object.getString("author" ));
-//                values.put(ItemsContract.Items.TITLE, object.getString("title" ));
-//                values.put(ItemsContract.Items.BODY, object.getString("body" ));
-//                values.put(ItemsContract.Items.THUMB_URL, object.getString("thumb" ));
-//                values.put(ItemsContract.Items.PHOTO_URL, object.getString("photo" ));
-//                values.put(ItemsContract.Items.ASPECT_RATIO, object.getString("aspect_ratio" ));
-//                values.put(ItemsContract.Items.PUBLISHED_DATE, object.getString("published_date"));
-//                cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
-//            }
-//
-//            getContentResolver().applyBatch(ItemsContract.CONTENT_AUTHORITY, cpo);
-//
-//        } catch (JSONException | RemoteException | OperationApplicationException e) {
-//            Log.e(TAG, "Error updating content.", e);
-//        }
-//
-//        sendStickyBroadcast(
-//                new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, false));
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null || !ni.isConnected()) {
+            Log.w(TAG, "Not online, not refreshing.");
+            return;
+        }
+
+        sendStickyBroadcast(
+                new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, true));
+
+        // Don't even inspect the intent, we only do one thing, and that's fetch content.
+        ArrayList<ContentProviderOperation> cpo = new ArrayList<ContentProviderOperation>();
+
+        Uri dirUri = ItemsContract.Items.buildDirUri();
+
+        // Delete all items
+        cpo.add(ContentProviderOperation.newDelete(dirUri).build());
+        try {
+            JSONArray array = RemoteEndpointUtil.fetchJsonArray();
+            if (array == null) {
+                throw new JSONException("Invalid parsed item array" );
+            }
+
+            for (int i = 0; i < array.length(); i++) {
+                ContentValues values = new ContentValues();
+                JSONObject object = array.getJSONObject(i);
+                values.put(ItemsContract.Items.SERVER_ID, object.getString("id" ));
+                values.put(ItemsContract.Items.AUTHOR, object.getString("author" ));
+                values.put(ItemsContract.Items.TITLE, object.getString("title" ));
+                values.put(ItemsContract.Items.BODY, object.getString("body" ));
+                values.put(ItemsContract.Items.THUMB_URL, object.getString("thumb" ));
+                values.put(ItemsContract.Items.PHOTO_URL, object.getString("photo" ));
+                values.put(ItemsContract.Items.ASPECT_RATIO, object.getString("aspect_ratio" ));
+                values.put(ItemsContract.Items.PUBLISHED_DATE, object.getString("published_date"));
+                cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
+            }
+
+            getContentResolver().applyBatch(ItemsContract.CONTENT_AUTHORITY, cpo);
+
+        } catch (JSONException | RemoteException | OperationApplicationException e) {
+            Log.e(TAG, "Error updating content.", e);
+        }
+
+        sendStickyBroadcast(
+                new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, false));
     }
 }

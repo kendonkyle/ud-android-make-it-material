@@ -13,16 +13,14 @@
         <FrameLayout
             android:id="@+id/photo_container"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="@dimen/detail_photo_height"
             android:background="@color/photo_placeholder">
-            <!--suppress AndroidLintContentDescription -->
 
             <com.example.xyzreader.ui.AdjustableAspectImageView
                 android:id="@+id/photo"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:scaleType="centerCrop"
-                android:transitionName="@string/transition_photo"
                 />
 
             <View
@@ -42,12 +40,13 @@
     </android.support.design.widget.AppBarLayout>
 
     <!--<com.example.xyzreader.ui.ObservableScrollView-->
+    <!--android:layout_gravity="center_vertical"-->
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="-220dp"
-        android:elevation="12dp"
+        android:layout_marginTop="@dimen/scroll_view_margin"
+        android:elevation="6dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <FrameLayout
@@ -60,8 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="#fff"
-                android:elevation="2dp"
                 android:maxWidth="@dimen/detail_card_max_width"
+                android:elevation="2dp"
                 android:orientation="vertical">
                 <!--android:layout_marginTop="@dimen/detail_card_top_margin"-->
 
@@ -83,18 +82,17 @@
             </com.example.xyzreader.ui.MaxWidthLinearLayout>
         </FrameLayout>
     </android.support.v4.widget.NestedScrollView>
-    <!--</com.example.xyzreader.ui.ObservableScrollView>-->
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/share_fab"
+        android:id="@+id/returntotop_fab"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:background="@drawable/add_fab_background"
-        android:contentDescription="@string/action_share"
-        android:elevation="@dimen/fab_elevation"
-        android:src="@drawable/ic_share"
-        android:stateListAnimator="@animator/fab_state_list_anim" />
+        android:contentDescription="@string/action_goto_top"
+        android:src="@drawable/ic_return_to_top"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

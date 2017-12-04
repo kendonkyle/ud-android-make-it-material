@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:background="@color/theme_primary"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/mytext"
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
-        android:textColor="#ffffff"
-        android:textStyle="bold|italic"
-        android:visibility="visible"
-        tools:text="@string/app_name" />
-        <!--android:textSize="18sp"-->
-        <!--android:fontFamily="bold"-->
+        android:src="@drawable/logo"
+        />
 
 </LinearLayout>
