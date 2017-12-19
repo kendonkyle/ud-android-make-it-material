@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.xyzreader.BuildConfig;
 import com.example.xyzreader.R;
@@ -57,6 +60,13 @@ public class ArticleListActivity extends AppCompatActivity implements
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
+
+    private boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +109,11 @@ public class ArticleListActivity extends AppCompatActivity implements
 
 
     private void refresh() {
-        startService(new Intent(this, UpdaterService.class));
+        if(isOnline()) {
+            startService(new Intent(this, UpdaterService.class));
+        } else {
+            Toast.makeText(this, R.string.connection_error, Toast.LENGTH_LONG);
+        }
     }
 
     @Override

@@ -30,7 +30,9 @@ import com.example.xyzreader.data.ItemsContract;
 public class ArticleDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private Cursor mCursor;
+    public Cursor mCursor;
+    private static final String SELECTED_ID_KEY = "slectedId";
+    private static final String START_ID_KEY = "startId";
     private long mStartId;
 
     private long mSelectedItemId;
@@ -57,7 +59,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
         mPager.setPageMargin((int) TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
+                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -80,11 +82,13 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
                 mSelectedItemId = mStartId;
             }
+        } else {
+            mSelectedItemId = savedInstanceState.getLong(SELECTED_ID_KEY);
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Slide slide = new Slide(Gravity.RIGHT);
             slide.addTarget(R.id.pager);
-            slide.setDuration(400);
+            slide.setDuration(300);
             getWindow().setEnterTransition(slide);
         }
     }
@@ -137,7 +141,7 @@ public class ArticleDetailActivity extends AppCompatActivity
             super.setPrimaryItem(container, position, object);
             ArticleDetailFragment fragment = (ArticleDetailFragment) object;
             if (fragment != null) {
-                mSelectedItemUpButtonFloor = fragment.getUpButtonFloor();
+//                mSelectedItemUpButtonFloor = fragment.getUpButtonFloor();
             }
         }
 
@@ -151,5 +155,6 @@ public class ArticleDetailActivity extends AppCompatActivity
         public int getCount() {
             return (mCursor != null) ? mCursor.getCount() : 0;
         }
+
     }
 }

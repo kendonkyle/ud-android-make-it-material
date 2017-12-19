@@ -46,7 +46,6 @@ public class ArticleDetailFragment extends Fragment implements
     public static final String ARG_ITEM_ID = "item_id";
     private static final float PARALLAX_FACTOR = 1.25f;
 
-    private Cursor mCursor;
     private long mItemId;
     private View mRootView;
     private int mMutedColor = 0xFF333333;
@@ -107,11 +106,6 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // In support library r8, calling initLoader for a fragment in a FragmentPagerAdapter in
-        // the fragment's onCreate may cause the same LoaderManager to be dealt to multiple
-        // fragments because their mIndex is -1 (haven't been added to the activity yet). Thus,
-        // we do this in onActivityCreated.
-        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -120,9 +114,11 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.article_detail_collapsing_toolbar);
+        collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.textwhite));
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.transparent));
         mToolbar = mRootView.findViewById(R.id.article_detail_fragment_toolbar);
-        mToolbar.setTitleTextColor(getResources().getColor(R.color.textwhite));
-        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+//        mToolbar.setTitleTextColor(getResources().getColor(R.color.textwhite));
+//        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         mParentActivity = (AppCompatActivity)getActivity();
         mParentActivity.setSupportActionBar(mToolbar);
         mParentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -152,7 +148,7 @@ public class ArticleDetailFragment extends Fragment implements
 
 
         bindViews();
-        updateStatusBar();
+//        updateStatusBar();
 
         mScrollToTopBtn = mRootView.findViewById(R.id.returntotop_fab);
         mScrollToTopBtn.setOnClickListener(new View.OnClickListener() {
@@ -179,7 +175,6 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.blue(mMutedColor) * 0.9));
         }
         mStatusBarColorDrawable.setColor(color);
-//        mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
     }
 
     static float progress(float v, float min, float max) {
@@ -223,9 +218,9 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
-            if(mToolbar != null)    {
-                mToolbar.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
-            }
+//            if(mToolbar != null)    {
+//                mToolbar.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
+//            }
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
@@ -258,7 +253,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-                                updateStatusBar();
+//                                updateStatusBar();
                             }
                         }
 
@@ -314,5 +309,11 @@ public class ArticleDetailFragment extends Fragment implements
         return mIsCard
                 ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
                 : mPhotoView.getHeight() - mScrollY;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.put
     }
 }
