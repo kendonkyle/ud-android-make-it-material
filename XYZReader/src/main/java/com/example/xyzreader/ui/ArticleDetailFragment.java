@@ -6,7 +6,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -28,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
+import com.example.xyzreader.data.model.Article;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,14 +39,13 @@ import java.util.GregorianCalendar;
  * either contained in a {@link ArticleListActivity} in two-pane mode (on
  * tablets) or a {@link ArticleDetailActivity} on handsets.
  */
-public class ArticleDetailFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class ArticleDetailFragment extends Fragment {
     private static final String TAG = "ArticleDetailFragment";
 
-    public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_ITEM = "article_item";
     private static final float PARALLAX_FACTOR = 1.25f;
 
-    private long mItemId;
+    private Article mItem;
     private View mRootView;
     private int mMutedColor = 0xFF333333;
 //    private ObservableScrollView mScrollView;
@@ -77,9 +76,9 @@ public class ArticleDetailFragment extends Fragment implements
     public ArticleDetailFragment() {
     }
 
-    public static ArticleDetailFragment newInstance(long itemId) {
+    public static ArticleDetailFragment newInstance(Article item) {
         Bundle arguments = new Bundle();
-        arguments.putLong(ARG_ITEM_ID, itemId);
+        arguments.putParcelable(ARG_ITEM, item);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -89,8 +88,8 @@ public class ArticleDetailFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            mItemId = getArguments().getLong(ARG_ITEM_ID);
+        if (getArguments().containsKey(ARG_ITEM)) {
+            mItem = getArguments().getParcelable(ARG_ITEM);
         }
 
         mIsCard = getResources().getBoolean(R.bool.detail_is_card); //THIS IS NOT NEEDED ??
@@ -114,8 +113,10 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.article_detail_collapsing_toolbar);
-        collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.textwhite));
-        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.transparent));
+        if(collapsingToolbarLayout != null) {
+            collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.textwhite));
+            collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.transparent));
+        }
         mToolbar = mRootView.findViewById(R.id.article_detail_fragment_toolbar);
 //        mToolbar.setTitleTextColor(getResources().getColor(R.color.textwhite));
 //        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -154,7 +155,7 @@ public class ArticleDetailFragment extends Fragment implements
         mScrollToTopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mCursor != null) {
+                if(mItem != null) {
                     mScrollView.scrollTo(0,0);
                 }
             }
@@ -193,7 +194,7 @@ public class ArticleDetailFragment extends Fragment implements
 
     private Date parsePublishedDate() {
         try {
-            String date = mCursor.getString(ArticleLoader.Query.PUBLISHED_DATE);
+            String date = mItem.published_date;
             return dateFormat.parse(date);
         } catch (ParseException ex) {
             Log.e(TAG, ex.getMessage());
@@ -214,14 +215,14 @@ public class ArticleDetailFragment extends Fragment implements
 
 //        bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
-        if (mCursor != null) {
+        if (mItem != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
 //            if(mToolbar != null)    {
 //                mToolbar.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
 //            }
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+            titleView.setText(mItem.title);
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 bylineView.setText(Html.fromHtml(
@@ -230,20 +231,20 @@ public class ArticleDetailFragment extends Fragment implements
                                 System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_ALL).toString()
                                 + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                                + mItem.author
                                 + "</font>"));
 
             } else {
                 // If date is before 1902, just show the string
                 bylineView.setText(Html.fromHtml(
                         outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-                        + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                        + mItem.author
                                 + "</font>"));
 
             }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            bodyView.setText(Html.fromHtml(mItem.body.replaceAll("(\r\n|\n)", "<br />")));
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
-                    .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
+                    .get(mItem.photo_url, new ImageLoader.ImageListener() {
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
@@ -271,49 +272,8 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return ArticleLoader.newInstanceForItemId(getActivity(), mItemId);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if (!isAdded()) {
-            if (cursor != null) {
-                cursor.close();
-            }
-            return;
-        }
-
-        mCursor = cursor;
-        if (mCursor != null && !mCursor.moveToFirst()) {
-            Log.e(TAG, "Error reading item detail cursor");
-            mCursor.close();
-            mCursor = null;
-        }
-
-        bindViews();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mCursor = null;
-        bindViews();
-    }
-
-    public int getUpButtonFloor() {
-        if (mPhotoContainerView == null || mPhotoView.getHeight() == 0) {
-            return Integer.MAX_VALUE;
-        }
-
-        // account for parallax
-        return mIsCard
-                ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
-                : mPhotoView.getHeight() - mScrollY;
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.put
+//        outState.putParcelable();
     }
 }

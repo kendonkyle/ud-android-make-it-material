@@ -6,6 +6,8 @@ import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
@@ -23,6 +25,7 @@ import android.view.WindowInsets;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
+import com.example.xyzreader.data.model.Article;
 
 /**
  * An activity representing a single Article detail screen, letting you swipe between articles.
@@ -145,10 +148,21 @@ public class ArticleDetailActivity extends AppCompatActivity
             }
         }
 
+        public Article getArticle(int position) {
+            mCursor.moveToPosition(position);
+            Article article = new Article();
+            article.title = mCursor.getString(ArticleLoader.Query.TITLE);
+            article.author = mCursor.getString(ArticleLoader.Query.AUTHOR);
+            article.body = mCursor.getString(ArticleLoader.Query.BODY);
+            article.published_date = mCursor.getString(ArticleLoader.Query.PUBLISHED_DATE);
+            article.photo_url = mCursor.getString(ArticleLoader.Query.PHOTO_URL);
+            article.thumb_url = mCursor.getString(ArticleLoader.Query.THUMB_URL);
+            return article;
+        }
+
         @Override
         public Fragment getItem(int position) {
-            mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            return ArticleDetailFragment.newInstance(getArticle(position));
         }
 
         @Override

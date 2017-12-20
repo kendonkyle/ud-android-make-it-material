@@ -25,8 +25,8 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:background="@drawable/photo_background_protection" />
+                android:layout_height="?attr/actionBarSize"
+                android:background="@drawable/inverse_photo_background_protection" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/article_detail_fragment_toolbar"
@@ -92,6 +92,7 @@
         android:layout_marginRight="@dimen/fab_margin"
         android:background="@drawable/add_fab_background"
         android:contentDescription="@string/action_goto_top"
+        android:elevation="@dimen/fab_elevation"
         android:src="@drawable/ic_return_to_top"
         />
 
