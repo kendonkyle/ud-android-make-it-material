@@ -8,7 +8,7 @@
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="8dp">
+        android:elevation="@dimen/app_bar_elevation">
 
         <android.support.design.widget.CollapsingToolbarLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,6 +27,7 @@
                     android:id="@+id/photo"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:src="@drawable/imageplaceholder"
                     android:scaleType="centerCrop" />
 
                 <View
@@ -66,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="#fff"
-                android:elevation="2dp"
+                android:elevation="@dimen/card_elevation"
                 android:maxWidth="@dimen/detail_card_max_width"
                 android:orientation="vertical">
 

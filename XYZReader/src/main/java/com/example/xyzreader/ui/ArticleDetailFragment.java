@@ -23,11 +23,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+//import com.android.volley.VolleyError;
+//import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.model.Article;
+import com.example.xyzreader.remote.GlideApp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -118,8 +119,8 @@ public class ArticleDetailFragment extends Fragment {
             collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.transparent));
         }
         mToolbar = mRootView.findViewById(R.id.article_detail_fragment_toolbar);
-//        mToolbar.setTitleTextColor(getResources().getColor(R.color.textwhite));
-//        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mToolbar.setTitleTextColor(getResources().getColor(R.color.textwhite));
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         mParentActivity = (AppCompatActivity)getActivity();
         mParentActivity.setSupportActionBar(mToolbar);
         mParentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -223,6 +224,7 @@ public class ArticleDetailFragment extends Fragment {
 //                mToolbar.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
 //            }
             titleView.setText(mItem.title);
+            mToolbar.setTitle(mItem.title);
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 bylineView.setText(Html.fromHtml(
@@ -243,26 +245,10 @@ public class ArticleDetailFragment extends Fragment {
 
             }
             bodyView.setText(Html.fromHtml(mItem.body.replaceAll("(\r\n|\n)", "<br />")));
-            ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
-                    .get(mItem.photo_url, new ImageLoader.ImageListener() {
-                        @Override
-                        public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                            Bitmap bitmap = imageContainer.getBitmap();
-                            if (bitmap != null) {
-                                Palette p = Palette.generate(bitmap, 12);
-                                mMutedColor = p.getDarkMutedColor(getResources().getColor(R.color.theme_primary_dark));
-                                mPhotoView.setImageBitmap(imageContainer.getBitmap());
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mMutedColor);
-//                                updateStatusBar();
-                            }
-                        }
-
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-
-                        }
-                    });
+            GlideApp.with(this)
+                    .load(mItem.photo_url)
+                    .placeholder(R.drawable.imageplaceholder)
+                    .into(mPhotoView);
         } else {
             mRootView.setVisibility(View.GONE);
             titleView.setText("N/A");
